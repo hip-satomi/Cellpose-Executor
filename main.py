@@ -54,7 +54,7 @@ result = dict(
     segmentation = segmentation
 )
 
-with open('output.json') as output:
+with open('output.json', 'w') as output:
     json.dump(result, output)
 
 mlflow.log_artifact('output.json')
