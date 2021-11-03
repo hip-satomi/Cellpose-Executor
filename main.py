@@ -14,6 +14,9 @@ from cellpose import models
 def get_git_revision_short_hash() -> str:
     return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('ascii').strip()
 
+def get_git_url() -> str:
+    return subprocess.check_output(['git', 'config', '--get', 'remote.origin.url']).decode('ascii').strip()
+
 img = skimage.io.imread(sys.argv[1])
 
 use_GPU = models.use_gpu()
@@ -56,9 +59,10 @@ segmentation = [dict(
 
 # get the git hash of the current commit
 short_hash = get_git_revision_short_hash()
+git_url = get_git_url()
 
 result = dict(
-    model_version = f'cellpose@{short_hash}',
+    model_version = f'{git_url}#{short_hash}',
     format_version = '0.1',
     segmentation = segmentation
 )
