@@ -35,10 +35,10 @@ model = models.Cellpose(gpu=use_GPU, model_type='cyto')
 
 channels = [[0,0]]
 diameter = 30
-flow_threshold = 0.4
-cellprob_threshold = 0.2
+#flow_threshold = 0.4
+#cellprob_threshold = 0.
 
-masks, flows, styles, diams = model.eval([img], diameter=diameter, flow_threshold=flow_threshold, channels=channels, cellprob_threshold=cellprob_threshold, tile=True)
+masks, flows, styles, diams = model.eval([img], diameter=diameter, channels=channels, tile=True)
 
 import cv2
 
