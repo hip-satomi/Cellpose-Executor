@@ -55,7 +55,7 @@ for index in range(1, num_cells+1):
     contours, hierarchy = cv2.findContours(np.where(bool_mask > score_threshold, 1, 0).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     for contour in contours:
-        np.squeeze(contour)
+        contour = np.squeeze(contour)
         all_contours.append(contour)
 
 segmentation = [dict(
