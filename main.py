@@ -10,6 +10,9 @@ import json
 
 from cellpose import models
 
+def get_git_revision_short_hash() -> str:
+    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('ascii').strip()
+
 img = skimage.io.imread(sys.argv[1])
 
 use_GPU = models.use_gpu()
@@ -50,8 +53,11 @@ segmentation = [dict(
     type = 'Polygon'
 ) for contour in all_contours]
 
+# get the git hash of the current commit
+short_hash = get_git_revision_short_hash()
+
 result = dict(
-    model = 'cellpose',
+    model_version = f'cellpose@{short_hash}',
     format_version = '0.1',
     segmentation = segmentation
 )
