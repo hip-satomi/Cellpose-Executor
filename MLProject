@@ -8,5 +8,5 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      image_file: path
-    command: "python main.py {image_file}"
+      input_image: path
+    command: "python main.py {input_image}"
