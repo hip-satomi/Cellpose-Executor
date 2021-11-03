@@ -1,0 +1,5 @@
+name: cellpose-executor
+dependencies:
+  - python
+  - pip:
+    - mlflow

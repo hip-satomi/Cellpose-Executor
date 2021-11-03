@@ -1,0 +1,12 @@
+name: CellPose-Executor Project
+
+conda_env: conda.yaml
+# Can have a docker_env instead of a conda_env, e.g.
+# docker_env:
+#    image:  mlflow-docker-example
+
+entry_points:
+  main:
+    parameters:
+      image_file: path
+    command: "python main.py {image_file}"
