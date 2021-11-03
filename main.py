@@ -45,7 +45,7 @@ for index in range(1, num_cells+1):
 
 segmentation = [dict(
     label = 'Cell',
-    contour_coordinates = contour.tolist()
+    contour_coordinates = contour.tolist(),
     type = 'Polygon'
 ) for contour in all_contours]
 
