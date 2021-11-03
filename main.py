@@ -18,7 +18,11 @@ def get_git_revision_short_hash() -> str:
 def get_git_url() -> str:
     basic_url = subprocess.check_output(['git', 'config', '--get', 'remote.origin.url']).decode('ascii').strip()
     parsed = urlparse(basic_url)
-    return parsed._replace(netloc="{}@{}".format("", parsed.hostname)).geturl()
+    if parsed.username and parsed.password:
+        # erase username and password
+        return parsed._replace(netloc="{}@{}".format("", parsed.hostname)).geturl()
+    else:
+        return parsed.geturl()
 
 img = skimage.io.imread(sys.argv[1])
 
