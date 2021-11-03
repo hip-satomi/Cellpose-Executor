@@ -52,6 +52,7 @@ segmentation = [dict(
 
 result = dict(
     model = 'cellpose',
+    format_version = '0.1',
     segmentation = segmentation
 )
 
