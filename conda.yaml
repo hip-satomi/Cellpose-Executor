@@ -3,3 +3,8 @@ dependencies:
   - python
   - pip:
     - mlflow
+    - cellpose==0.6.5
+    - opencv-python-headless==4.5.4.58
+    - torch==1.10.0
+    - scikit-image==0.18.3
+    - imageio==2.10.1
