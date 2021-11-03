@@ -20,7 +20,7 @@ def get_git_url() -> str:
     parsed = urlparse(basic_url)
     if parsed.username and parsed.password:
         # erase username and password
-        return parsed._replace(netloc="{}@{}".format("", parsed.hostname)).geturl()
+        return parsed._replace(netloc="{}".format(parsed.hostname)).geturl()
     else:
         return parsed.geturl()
 
