@@ -7,6 +7,7 @@ import matplotlib as mpl
 import sys
 import mlflow
 import json
+import subprocess
 
 from cellpose import models
 
