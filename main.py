@@ -37,6 +37,7 @@ print('>>> GPU activated? %d'%use_GPU)
 # DEFINE CELLPOSE MODEL
 # model_type='cyto' or model_type='nuclei'
 if omni:
+    print('Loading omni model...')
     model = models.Cellpose(gpu=use_GPU, model_type='bact_omni', omni=True)
 else:
     model = models.Cellpose(gpu=use_GPU, model_type='cyto')
