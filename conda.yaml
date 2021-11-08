@@ -7,7 +7,7 @@ dependencies:
     #- cellpose==0.6.5
     # brand new cellpose dependency (you should not do this due to reproducibility/stability issues)
     - git+https://github.com/MouseLand/cellpose.git#egg=cellpose[omni]
-    - numpy=1.21.4
+    - numpy==1.21.4
     - opencv-python-headless==4.5.4.58
     - torch==1.10.0
     - scikit-image==0.18.3
