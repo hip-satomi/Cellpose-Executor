@@ -10,3 +10,8 @@ entry_points:
     parameters:
       input_image: path
     command: "python main.py {input_image}"
+
+  omnipose:
+    parameters:
+      input_image: path
+    command: "python main.py {input_image}"
