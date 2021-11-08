@@ -14,4 +14,4 @@ entry_points:
   omnipose:
     parameters:
       input_image: path
-    command: "python main.py {input_image}"
+    command: "python main.py {input_image} omni"
