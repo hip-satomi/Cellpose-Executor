@@ -4,7 +4,6 @@ dependencies:
   - pip=21.2.4
   - pip:
     - mlflow
-  - pip:                                                                                             
     - addict==2.4.0                                                                                  
     - albumentations==0.5.2                                                                          
     #- cellpose==0.6.6.dev138+gd769939                                                                
