@@ -5,7 +5,7 @@ channels:
   - defaults
 dependencies:
   #- python=3.8.5
- - pip=21.2.4
+  - pip=21.2.4
   #- _libgcc_mutex=0.1=main
   #- blas=1.0=mkl
   - ca-certificates=2020.12.5=ha878542_0
