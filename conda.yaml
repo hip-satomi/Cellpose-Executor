@@ -7,7 +7,7 @@ dependencies:
   - pip:                                                                                             
     - addict==2.4.0                                                                                  
     - albumentations==0.5.2                                                                          
-    - cellpose==0.6.6.dev138+gd769939                                                                
+    #- cellpose==0.6.6.dev138+gd769939                                                                
     - cycler==0.10.0                                                                                 
     - cython==0.29.21                             
     - decorator==4.4.2                            
