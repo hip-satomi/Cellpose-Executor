@@ -10,7 +10,7 @@ dependencies:
   #- blas=1.0=mkl
   - pip:
     - mlflow
-    - "--editable=git+https://github.com/MouseLand/cellpose.git#egg=cellpose[omni]"
+    - "--editable=pip install git+https://github.com/MouseLand/cellpose.git@d76993948975d60d4fed116a19d36486e99412ff#egg=cellpose[omni]"
     #- cellpose==0.6.5
     # brand new cellpose dependency (you should not do this due to reproducibility/stability issues)
     #- opencv-python-headless==4.5.4.58

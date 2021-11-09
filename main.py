@@ -31,8 +31,8 @@ if len(sys.argv) > 2 and sys.argv[2] == 'omni':
 else:
     omni = False
 
-use_GPU = models.use_gpu()
-print('>>> GPU activated? %d'%use_GPU)
+#use_GPU = models.use_gpu()
+#print('>>> GPU activated? %d'%use_GPU)
 
 # DEFINE CELLPOSE MODEL
 # model_type='cyto' or model_type='nuclei'
