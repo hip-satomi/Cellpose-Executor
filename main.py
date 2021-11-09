@@ -50,7 +50,9 @@ diameter = 30
 flow_threshold = 0.4
 cellprob_threshold = 0.2
 
-masks, flows, styles, diams = model.eval([img], diameter=diameter, flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold, channels=channels, tile=True)
+#flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold
+
+masks, flows, styles, diams = model.eval([img], diameter=diameter, channels=channels, tile=True)
 
 import cv2
 
