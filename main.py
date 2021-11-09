@@ -52,7 +52,7 @@ cellprob_threshold = 0.2
 
 #flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold
 
-masks, flows, styles, diams = model.eval([img], diameter=diameter, channels=channels, tile=True)
+masks, flows, styles, diams = model.eval([img], diameter=diameter, channels=channels, tile=True, rescale=None)
 
 import cv2
 
