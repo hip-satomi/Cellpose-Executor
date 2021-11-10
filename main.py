@@ -9,6 +9,7 @@ import mlflow
 import json
 import subprocess
 from urllib.parse import urlparse
+import torch
 
 from cellpose import models
 
@@ -32,7 +33,7 @@ else:
     omni = False
 
 #use_GPU = models.use_gpu()
-use_GPU = False
+use_GPU = torch.cuda.is_available()
 print('>>> GPU activated? %d'%use_GPU)
 print('Hard coded deactivation')
 
