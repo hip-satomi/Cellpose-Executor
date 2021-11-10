@@ -35,7 +35,6 @@ else:
 #use_GPU = models.use_gpu()
 use_GPU = torch.cuda.is_available()
 print('>>> GPU activated? %d'%use_GPU)
-print('Hard coded deactivation')
 
 # DEFINE CELLPOSE MODEL
 # model_type='cyto' or model_type='nuclei'
