@@ -6,6 +6,8 @@ channels:
 dependencies:
   - python=3.8.5
   - pip=21.2.4
+  - cudatoolkit=10.2
+  - pytorch=1.9.0
   #- _libgcc_mutex=0.1=main
   #- blas=1.0=mkl
   - pip:
