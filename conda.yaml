@@ -8,7 +8,7 @@ dependencies:
   - pip=21.2.4
   - cudatoolkit=10.2
   - pytorch=1.9.0
-  - git=v2.33.1
+  - git
   #- _libgcc_mutex=0.1=main
   #- blas=1.0=mkl
   - pip:
