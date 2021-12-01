@@ -13,8 +13,10 @@ import torch
 
 from cellpose import models
 
+
 def get_git_revision_short_hash() -> str:
     return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('ascii').strip()
+
 
 def get_git_url() -> str:
     basic_url = subprocess.check_output(['git', 'config', '--get', 'remote.origin.url']).decode('ascii').strip()
@@ -24,6 +26,12 @@ def get_git_url() -> str:
         return parsed._replace(netloc="{}".format(parsed.hostname)).geturl()
     else:
         return parsed.geturl()
+
+
+# get the git hash of the current commit
+short_hash = get_git_revision_short_hash()
+git_url = get_git_url()
+
 
 img = skimage.io.imread(sys.argv[1])
 
@@ -52,7 +60,11 @@ cellprob_threshold = 0.2
 
 #flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold
 
-masks, flows, styles, diams = model.eval([img], channels=channels, rescale=None, diameter=None, flow_threshold=.9, mask_threshold=.25, resample=True, diam_threshold=100)
+try:
+    masks, flows, styles, diams = model.eval([img], channels=channels, rescale=None, diameter=None, flow_threshold=.9, mask_threshold=.25, resample=True, diam_threshold=100)
+except:
+    print("Error in OmniPose prediction")
+    masks = [[],]
 
 import cv2
 
@@ -78,9 +90,6 @@ segmentation = [dict(
     type = 'Polygon'
 ) for contour in all_contours]
 
-# get the git hash of the current commit
-short_hash = get_git_revision_short_hash()
-git_url = get_git_url()
 
 result = dict(
     model_version = f'{git_url}#{short_hash}',
