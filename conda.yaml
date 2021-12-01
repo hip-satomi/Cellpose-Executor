@@ -14,7 +14,7 @@ dependencies:
   - pip:
     - pillow>=8.4.0
     - mlflow
-    - "--editable=git+https://github.com/MouseLand/cellpose.git@e3d4fce7db9034d864dd91c4fe7c08a305921d47#egg=cellpose[omni]"
+    - "--editable=git+https://github.com/MouseLand/cellpose.git@v0.7.3#egg=cellpose[omni]"
     #- cellpose==0.6.5
     # brand new cellpose dependency (you should not do this due to reproducibility/stability issues)
     #- opencv-python-headless==4.5.4.58
