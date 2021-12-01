@@ -10,6 +10,7 @@ import json
 import subprocess
 from urllib.parse import urlparse
 import torch
+from PIL import Image
 
 from cellpose import models
 
@@ -33,7 +34,7 @@ short_hash = get_git_revision_short_hash()
 git_url = get_git_url()
 
 
-img = skimage.io.imread(sys.argv[1])
+img = np.asarray(Image.open(sys.argv[1]))
 
 if len(sys.argv) > 2 and sys.argv[2] == 'omni':
     omni = True

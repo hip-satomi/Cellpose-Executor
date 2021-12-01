@@ -12,6 +12,7 @@ dependencies:
   #- _libgcc_mutex=0.1=main
   #- blas=1.0=mkl
   - pip:
+    - pillow>=8.4.0
     - mlflow
     - "--editable=git+https://github.com/MouseLand/cellpose.git@e3d4fce7db9034d864dd91c4fe7c08a305921d47#egg=cellpose[omni]"
     #- cellpose==0.6.5
