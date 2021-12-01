@@ -62,7 +62,7 @@ cellprob_threshold = 0.2
 #flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold
 
 try:
-    masks, flows, styles, diams = model.eval([img], channels=channels, rescale=None, diameter=50, flow_threshold=.9, mask_threshold=.25, resample=True, diam_threshold=100)
+    masks, flows, styles, diams = model.eval([img], channels=channels, rescale=None, diameter=None, flow_threshold=.9, mask_threshold=.25, resample=True, diam_threshold=100)
 except:
     print("Error in OmniPose prediction")
     masks = [[],]
