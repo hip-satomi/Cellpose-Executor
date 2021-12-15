@@ -14,6 +14,7 @@ dependencies:
   - pip:
     - pillow>=8.4.0
     - mlflow
+    - matplotlib==3.5.1
     - "--editable=git+https://github.com/MouseLand/cellpose.git@v0.7.3#egg=cellpose[omni]"
     #- cellpose==0.6.5
     # brand new cellpose dependency (you should not do this due to reproducibility/stability issues)
