@@ -108,6 +108,9 @@ parser.add_argument('--omni', action="store_true", help="Use the omnipose model"
 
 args = parser.parse_args()
 
+if len(args.images) == 1:
+    args.images = args.images[0].split(' ')
+
 images = [np.asarray(Image.open(image_path)) for image_path in args.images]
 
 omni = args.omni
