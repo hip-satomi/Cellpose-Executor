@@ -33,7 +33,7 @@ short_hash = get_git_revision_short_hash()
 git_url = get_git_url()
 
 
-def predict(image, omni):
+def predict(img, omni):
 
     #use_GPU = models.use_gpu()
     use_GPU = torch.cuda.is_available()
