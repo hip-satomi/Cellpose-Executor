@@ -32,6 +32,7 @@ def get_git_url() -> str:
 short_hash = get_git_revision_short_hash()
 git_url = get_git_url()
 
+import argparse
 
 def predict(img, omni):
 
@@ -94,13 +95,17 @@ def predict(img, omni):
 
     return result
 
+parser = argparse.ArgumentParser(description='Process some integers.')
 
-img = np.asarray(Image.open(sys.argv[1]))
+parser.add_argument('images', type=str, nargs='+',
+                    help='list of images')
+parser.add_argument('--omni', action="store_true", help="Use the omnipose model")
 
-if len(sys.argv) > 2 and sys.argv[2] == 'omni':
-    omni = True
-else:
-    omni = False
+args = parser.parse_args()
+
+img = np.asarray(Image.open(args.images[0]))
+
+omni = args.omni
 
 result = predict(img, omni)
 
