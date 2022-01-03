@@ -28,10 +28,71 @@ def get_git_url() -> str:
     else:
         return parsed.geturl()
 
-
 # get the git hash of the current commit
 short_hash = get_git_revision_short_hash()
 git_url = get_git_url()
+
+
+def predict(image, omni):
+
+    #use_GPU = models.use_gpu()
+    use_GPU = torch.cuda.is_available()
+    print('>>> GPU activated? %d'%use_GPU)
+
+    # DEFINE CELLPOSE MODEL
+    # model_type='cyto' or model_type='nuclei'
+    if omni:
+        print('Loading omni model...')
+        model = models.Cellpose(gpu=use_GPU, model_type='bact_omni', omni=True)
+    else:
+        model = models.Cellpose(gpu=use_GPU, model_type='cyto')
+
+
+    channels = [[0,0]]
+    diameter = 30
+    flow_threshold = 0.4
+    cellprob_threshold = 0.2
+
+    #flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold
+
+    try:
+        masks, flows, styles, diams = model.eval([img], channels=channels, rescale=None, diameter=None, flow_threshold=.9, mask_threshold=.25, resample=True, diam_threshold=100)
+    except:
+        print("Error in OmniPose prediction")
+        masks = [[],]
+
+    import cv2
+
+    int_mask = masks[0]
+
+    num_cells = np.max(int_mask)
+    score_threshold = 0.5
+
+    all_contours = []
+
+    for index in range(1, num_cells+1):
+        bool_mask = int_mask == index
+
+        contours, hierarchy = cv2.findContours(np.where(bool_mask > score_threshold, 1, 0).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        for contour in contours:
+            contour = np.squeeze(contour)
+            all_contours.append(contour)
+
+    segmentation = [dict(
+        label = 'Cell',
+        contour_coordinates = contour.tolist(),
+        type = 'Polygon'
+    ) for contour in all_contours]
+
+
+    result = dict(
+        model_version = f'{git_url}#{short_hash}',
+        format_version = '0.1',
+        segmentation = segmentation
+    )
+
+    return result
 
 
 img = np.asarray(Image.open(sys.argv[1]))
@@ -41,62 +102,7 @@ if len(sys.argv) > 2 and sys.argv[2] == 'omni':
 else:
     omni = False
 
-#use_GPU = models.use_gpu()
-use_GPU = torch.cuda.is_available()
-print('>>> GPU activated? %d'%use_GPU)
-
-# DEFINE CELLPOSE MODEL
-# model_type='cyto' or model_type='nuclei'
-if omni:
-    print('Loading omni model...')
-    model = models.Cellpose(gpu=use_GPU, model_type='bact_omni', omni=True)
-else:
-    model = models.Cellpose(gpu=use_GPU, model_type='cyto')
-
-
-channels = [[0,0]]
-diameter = 30
-flow_threshold = 0.4
-cellprob_threshold = 0.2
-
-#flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold
-
-try:
-    masks, flows, styles, diams = model.eval([img], channels=channels, rescale=None, diameter=None, flow_threshold=.9, mask_threshold=.25, resample=True, diam_threshold=100)
-except:
-    print("Error in OmniPose prediction")
-    masks = [[],]
-
-import cv2
-
-int_mask = masks[0]
-
-num_cells = np.max(int_mask)
-score_threshold = 0.5
-
-all_contours = []
-
-for index in range(1, num_cells+1):
-    bool_mask = int_mask == index
-
-    contours, hierarchy = cv2.findContours(np.where(bool_mask > score_threshold, 1, 0).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    for contour in contours:
-        contour = np.squeeze(contour)
-        all_contours.append(contour)
-
-segmentation = [dict(
-    label = 'Cell',
-    contour_coordinates = contour.tolist(),
-    type = 'Polygon'
-) for contour in all_contours]
-
-
-result = dict(
-    model_version = f'{git_url}#{short_hash}',
-    format_version = '0.1',
-    segmentation = segmentation
-)
+result = predict(img, omni)
 
 with open('output.json', 'w') as output:
     json.dump(result, output)
