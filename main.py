@@ -57,7 +57,10 @@ def predict(images, omni):
     #flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold
 
     try:
-        masks, flows, styles, diams = model.eval(images, channels=channels, rescale=None, diameter=None, flow_threshold=.9, mask_threshold=.25, resample=True, diam_threshold=100)
+        masks, flows, styles, diams = model.eval(images, channels=[0,0],
+                                            diameter=0.0, invert=False,
+                                            net_avg=False, augment=False, resample=False,
+                                            do_3D=False, progress=None, omni=True)
     except:
         print("Error in OmniPose prediction")
         masks = [[],]
