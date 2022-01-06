@@ -14,4 +14,9 @@ entry_points:
   omnipose:
     parameters:
       input_image: path
-    command: "python main.py {input_image} omni"
+    command: "python main.py --omni {input_image}"
+
+  omnipose-batch:
+    parameters:
+      input_images: str
+    command: "python main.py --omni {input_images}"

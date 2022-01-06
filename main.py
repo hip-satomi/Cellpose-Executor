@@ -28,75 +28,97 @@ def get_git_url() -> str:
     else:
         return parsed.geturl()
 
-
 # get the git hash of the current commit
 short_hash = get_git_revision_short_hash()
 git_url = get_git_url()
 
+import argparse
 
-img = np.asarray(Image.open(sys.argv[1]))
+def predict(images, omni):
 
-if len(sys.argv) > 2 and sys.argv[2] == 'omni':
-    omni = True
-else:
-    omni = False
+    #use_GPU = models.use_gpu()
+    use_GPU = torch.cuda.is_available()
+    print('>>> GPU activated? %d'%use_GPU)
 
-#use_GPU = models.use_gpu()
-use_GPU = torch.cuda.is_available()
-print('>>> GPU activated? %d'%use_GPU)
-
-# DEFINE CELLPOSE MODEL
-# model_type='cyto' or model_type='nuclei'
-if omni:
-    print('Loading omni model...')
-    model = models.Cellpose(gpu=use_GPU, model_type='bact_omni', omni=True)
-else:
-    model = models.Cellpose(gpu=use_GPU, model_type='cyto')
+    # DEFINE CELLPOSE MODEL
+    # model_type='cyto' or model_type='nuclei'
+    if omni:
+        print('Loading omni model...')
+        model = models.Cellpose(gpu=use_GPU, model_type='bact_omni', omni=True)
+    else:
+        model = models.Cellpose(gpu=use_GPU, model_type='cyto')
 
 
-channels = [[0,0]]
-diameter = 30
-flow_threshold = 0.4
-cellprob_threshold = 0.2
+    channels = [[0,0]]
+    diameter = 30
+    flow_threshold = 0.4
+    cellprob_threshold = 0.2
 
-#flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold
+    #flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold
 
-try:
-    masks, flows, styles, diams = model.eval([img], channels=channels, rescale=None, diameter=None, flow_threshold=.9, mask_threshold=.25, resample=True, diam_threshold=100)
-except:
-    print("Error in OmniPose prediction")
-    masks = [[],]
+    try:
+        masks, flows, styles, diams = model.eval(images, channels=channels, rescale=None, diameter=None, flow_threshold=.9, mask_threshold=.25, resample=True, diam_threshold=100)
+    except:
+        print("Error in OmniPose prediction")
+        masks = [[],]
 
-import cv2
+    import cv2
 
-int_mask = masks[0]
+    full_result = []
 
-num_cells = np.max(int_mask)
-score_threshold = 0.5
+    for i,_ in enumerate(images):
+        int_mask = masks[i]
 
-all_contours = []
+        num_cells = np.max(int_mask)
+        score_threshold = 0.5
 
-for index in range(1, num_cells+1):
-    bool_mask = int_mask == index
+        all_contours = []
 
-    contours, hierarchy = cv2.findContours(np.where(bool_mask > score_threshold, 1, 0).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        for index in range(1, num_cells+1):
+            bool_mask = int_mask == index
 
-    for contour in contours:
-        contour = np.squeeze(contour)
-        all_contours.append(contour)
+            contours, hierarchy = cv2.findContours(np.where(bool_mask > score_threshold, 1, 0).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-segmentation = [dict(
-    label = 'Cell',
-    contour_coordinates = contour.tolist(),
-    type = 'Polygon'
-) for contour in all_contours]
+            for contour in contours:
+                contour = np.squeeze(contour)
+                all_contours.append(contour)
+
+        segmentation = [dict(
+            label = 'Cell',
+            contour_coordinates = contour.tolist(),
+            type = 'Polygon'
+        ) for contour in all_contours]
 
 
-result = dict(
-    model_version = f'{git_url}#{short_hash}',
-    format_version = '0.1',
-    segmentation = segmentation
-)
+        result = dict(
+            model_version = f'{git_url}#{short_hash}',
+            format_version = '0.1',
+            segmentation = segmentation
+        )
+
+        full_result.append(result)
+
+    return full_result
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+
+parser.add_argument('images', type=str, nargs='+',
+                    help='list of images')
+parser.add_argument('--omni', action="store_true", help="Use the omnipose model")
+
+args = parser.parse_args()
+
+if len(args.images) == 1:
+    args.images = args.images[0].split(' ')
+
+images = [np.asarray(Image.open(image_path)) for image_path in args.images]
+
+omni = args.omni
+
+result = predict(images, omni)
+
+if len(images) == 1:
+    result = result[0]
 
 with open('output.json', 'w') as output:
     json.dump(result, output)
