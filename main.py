@@ -93,7 +93,7 @@ def predict(images, omni):
     full_result = []
 
     all_rois = []
-    for res in process_map(extract_rois, masks, max_workers=3, chunksize=3):
+    for res in process_map(extract_rois, masks, max_workers=5, chunksize=2):
         all_rois.append(res)
 
     for roi_list in all_rois:
