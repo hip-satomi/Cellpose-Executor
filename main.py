@@ -11,9 +11,32 @@ import subprocess
 from urllib.parse import urlparse
 import torch
 from PIL import Image
+import cv2
+from tqdm.contrib.concurrent import process_map
+
 
 from cellpose import models
 
+def extract_rois(int_mask):
+    num_cells = np.max(int_mask)
+    score_threshold = 0.5
+
+    all_contours = []
+
+    for index in range(1, num_cells+1):
+        bool_mask = int_mask == index
+
+        contours, hierarchy = cv2.findContours(np.where(bool_mask > score_threshold, 1, 0).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        for contour in contours:
+            contour = np.squeeze(contour)
+            if contour.shape[0] < 3:
+                # drop non 2D contours
+                continue
+
+            all_contours.append(contour)
+
+    return all_contours
 
 def get_git_revision_short_hash() -> str:
     return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('ascii').strip()
@@ -69,28 +92,16 @@ def predict(images, omni):
 
     full_result = []
 
-    for i,_ in enumerate(images):
-        int_mask = masks[i]
+    all_rois = []
+    for res in process_map(extract_rois, masks, max_workers=3, chunksize=3):
+        all_rois.append(res)
 
-        num_cells = np.max(int_mask)
-        score_threshold = 0.5
-
-        all_contours = []
-
-        for index in range(1, num_cells+1):
-            bool_mask = int_mask == index
-
-            contours, hierarchy = cv2.findContours(np.where(bool_mask > score_threshold, 1, 0).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-            for contour in contours:
-                contour = np.squeeze(contour)
-                all_contours.append(contour)
-
+    for roi_list in all_rois:
         segmentation = [dict(
             label = 'Cell',
             contour_coordinates = contour.tolist(),
             type = 'Polygon'
-        ) for contour in all_contours]
+        ) for contour in roi_list]
 
 
         result = dict(
