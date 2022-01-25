@@ -13,6 +13,7 @@ import torch
 from PIL import Image
 import cv2
 from tqdm.contrib.concurrent import process_map
+import glob
 
 
 from cellpose import models
@@ -93,7 +94,7 @@ def predict(images, omni):
     full_result = []
 
     all_rois = []
-    for res in process_map(extract_rois, masks, max_workers=5, chunksize=2):
+    for res in process_map(extract_rois, masks, max_workers=5, chunksize=4):
         all_rois.append(res)
 
     for roi_list in all_rois:
@@ -123,7 +124,13 @@ parser.add_argument('--omni', action="store_true", help="Use the omnipose model"
 args = parser.parse_args()
 
 if len(args.images) == 1:
-    args.images = args.images[0].split(' ')
+    image_path = args.images[0]
+    if os.path.isdir(image_path):
+        # it's a folder, iterate all images in the folder
+        args.images = sorted(glob.glob(os.path.join(image_path, '*.png')))
+    else:
+        # it may be a list of images
+        args.images = image_path.split(' ')
 
 images = [np.asarray(Image.open(image_path)) for image_path in args.images]
 
