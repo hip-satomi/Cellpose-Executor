@@ -1,0 +1,38 @@
+image: ubuntu:22.04
+
+stages:
+ - test
+
+# test environment setup in the server image
+#test-env:
+#  stage: test
+#  image: $CI_REGISTRY/j.seiffarth/serve-segmentation/server:master
+#  script:
+#    - conda env create -f conda.yaml 
+
+# execute the segmentation prediction with a test image
+test-exec-cell:
+  variables:
+    SERVICE_LOG_NAME: "/builds/service-logs/logs-${CI_COMMIT_REF_NAME}-${CI_PIPELINE_ID}.txt"
+    FF_NETWORK_PER_BUILD: "true"     # activate container-to-container networking
+  stage: test
+  image: python:3.9.10
+  tags:
+    - big-ram
+  services:
+    - name: $CI_REGISTRY/j.seiffarth/serve-segmentation/server:master
+      alias: segserve
+      entrypoint:
+      - /bin/bash
+      command:
+      - -c
+      - "echo Log dir: ${SERVICE_LOG_NAME}; ls /; ls -all /builds; mkdir -p /builds/service-logs; ls /builds; source /home/appuser/.bashrc; uvicorn --host 0.0.0.0 --port 80 main:app 2>&1 | tee ${SERVICE_LOG_NAME}"
+
+  script:
+    - echo "Log dir ${SERVICE_LOG_NAME}"
+    - |
+      (tail -f -n +1 "${SERVICE_LOG_NAME}" | awk '{print "[service-logs]: " $0}' &)
+    - pip install requests pillow
+    - python tests/test.py
+  after_script:
+    - rm ${SERVICE_LOG_NAME}
