@@ -11,7 +11,7 @@ stages:
 #    - conda env create -f conda.yaml 
 
 # execute the segmentation prediction with a test image
-test-exec-cell:
+test-online-exec:
   variables:
     SERVICE_LOG_NAME: "/builds/service-logs/logs-${CI_COMMIT_REF_NAME}-${CI_PIPELINE_ID}.txt"
     FF_NETWORK_PER_BUILD: "true"     # activate container-to-container networking
@@ -20,7 +20,7 @@ test-exec-cell:
   tags:
     - big-ram
   services:
-    - name: $CI_REGISTRY/j.seiffarth/serve-segmentation/server:master
+    - name: $CI_REGISTRY/satomi/seg-serve/server:master
       alias: segserve
       entrypoint:
       - /bin/bash
