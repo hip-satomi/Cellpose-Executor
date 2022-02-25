@@ -104,14 +104,7 @@ def predict(images, omni):
             type = 'Polygon'
         ) for contour in roi_list]
 
-
-        result = dict(
-            model_version = f'{git_url}#{short_hash}',
-            format_version = '0.1',
-            segmentation = segmentation
-        )
-
-        full_result.append(result)
+        full_result.append(segmentation)
 
     return full_result
 
@@ -138,8 +131,12 @@ omni = args.omni
 
 result = predict(images, omni)
 
-if len(images) == 1:
-    result = result[0]
+# package everything
+result = dict(
+    model = f'{git_url}#{short_hash}',
+    format_version = '0.2',
+    segmentation_data = result
+)
 
 with open('output.json', 'w') as output:
     json.dump(result, output)
