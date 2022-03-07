@@ -15,3 +15,6 @@ entry_points:
     parameters:
       input_images: path
     command: "python main.py --omni {input_images}"
+
+  info:
+    command: "python info.py"

@@ -1,4 +1,4 @@
-image: ubuntu:22.04
+image: continuumio/miniconda3
 
 stages:
  - test
@@ -15,8 +15,8 @@ test-online-exec:
   variables:
     SERVICE_LOG_NAME: "/builds/service-logs/logs-${CI_COMMIT_REF_NAME}-${CI_PIPELINE_ID}.txt"
     FF_NETWORK_PER_BUILD: "true"     # activate container-to-container networking
+    CONDA_ENV: "cellpose-executor"
   stage: test
-  image: python:3.9.10
   tags:
     - big-ram
   services:
@@ -32,7 +32,14 @@ test-online-exec:
     - echo "Log dir ${SERVICE_LOG_NAME}"
     - |
       (tail -f -n +1 "${SERVICE_LOG_NAME}" | awk '{print "[service-logs]: " $0}' &)
-    - pip install requests pillow
-    - python tests/test.py
+    - pip install requests pillow coverage mlflow
+    - python -m unittest tests/test.py
+    - python -m coverage run --source=./ -m unittest tests/test.py
+    - coverage xml
+
   after_script:
     - rm ${SERVICE_LOG_NAME}
+  artifacts:
+    reports:
+      cobertura: coverage.xml
+

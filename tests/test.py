@@ -1,5 +1,10 @@
 import unittest
 import os
+from git_utils import get_git_url
+import mlflow
+import json
+
+from git_utils import get_git_revision_short_hash
 
 
 class TestSegmentation(unittest.TestCase):
@@ -16,9 +21,11 @@ class TestSegmentation(unittest.TestCase):
         with open('test.png', 'wb') as file:
             file.write(r.content)
 
-    def test_standard(self):
+    def test_cellpose(self):
         # test entrypoints: main (Cellpose)
         self.predict('main')
+    
+    def test_omnipose(self):
         self.predict('omnipose')
 
     def predict(self, entrypoint):
@@ -57,7 +64,7 @@ class TestSegmentation(unittest.TestCase):
 
         # send a request to the server
         response = requests.post(
-            'http://segserve/batch-image-prediction/', params=params, files=multipart_form_data, timeout=600
+            'http://segserve/batch-image-prediction/', params=params, files=multipart_form_data, timeout=20 * 60
         )
 
         # output response
@@ -65,6 +72,25 @@ class TestSegmentation(unittest.TestCase):
 
         # the request should be successful
         self.assertTrue(response.status_code == 200)
+
+    def test_info_endpoint(self):
+        run = mlflow.projects.run(
+            './',
+            entry_point="info",
+            backend='local',
+        )
+
+        # download the output artifact
+        client = mlflow.tracking.MlflowClient()
+        client.download_artifacts(run.run_id, 'output.json', './')
+
+        with open('output.json', 'r') as input_file:
+            info_result = json.load(input_file)
+            self.assertTrue(info_result['name'] == 'cellpose/omnipose')
+            self.assertTrue(info_result['git_hash'] == get_git_revision_short_hash())
+            self.assertTrue(info_result["git_url"] == get_git_url())
+            self.assertTrue(info_result["type"] == "info")
+
 
 if __name__ == '__main__':
     unittest.main()
