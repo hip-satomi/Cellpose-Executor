@@ -17,6 +17,7 @@ import glob
 
 
 from cellpose import models
+from git_utils import get_git_revision_short_hash, get_git_url
 
 def extract_rois(int_mask):
     num_cells = np.max(int_mask)
@@ -38,19 +39,6 @@ def extract_rois(int_mask):
             all_contours.append(contour)
 
     return all_contours
-
-def get_git_revision_short_hash() -> str:
-    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('ascii').strip()
-
-
-def get_git_url() -> str:
-    basic_url = subprocess.check_output(['git', 'config', '--get', 'remote.origin.url']).decode('ascii').strip()
-    parsed = urlparse(basic_url)
-    if parsed.username and parsed.password:
-        # erase username and password
-        return parsed._replace(netloc="{}".format(parsed.hostname)).geturl()
-    else:
-        return parsed.geturl()
 
 # get the git hash of the current commit
 short_hash = get_git_revision_short_hash()
@@ -108,37 +96,38 @@ def predict(images, omni):
 
     return full_result
 
-parser = argparse.ArgumentParser(description='Process some integers.')
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process some integers.')
 
-parser.add_argument('images', type=str, nargs='+',
-                    help='list of images')
-parser.add_argument('--omni', action="store_true", help="Use the omnipose model")
+    parser.add_argument('images', type=str, nargs='+',
+                        help='list of images')
+    parser.add_argument('--omni', action="store_true", help="Use the omnipose model")
 
-args = parser.parse_args()
+    args = parser.parse_args()
 
-if len(args.images) == 1:
-    image_path = args.images[0]
-    if os.path.isdir(image_path):
-        # it's a folder, iterate all images in the folder
-        args.images = sorted(glob.glob(os.path.join(image_path, '*.png')))
-    else:
-        # it may be a list of images
-        args.images = image_path.split(' ')
+    if len(args.images) == 1:
+        image_path = args.images[0]
+        if os.path.isdir(image_path):
+            # it's a folder, iterate all images in the folder
+            args.images = sorted(glob.glob(os.path.join(image_path, '*.png')))
+        else:
+            # it may be a list of images
+            args.images = image_path.split(' ')
 
-images = [np.asarray(Image.open(image_path)) for image_path in args.images]
+    images = [np.asarray(Image.open(image_path)) for image_path in args.images]
 
-omni = args.omni
+    omni = args.omni
 
-result = predict(images, omni)
+    result = predict(images, omni)
 
-# package everything
-result = dict(
-    model = f'{git_url}#{short_hash}',
-    format_version = '0.2',
-    segmentation_data = result
-)
+    # package everything
+    result = dict(
+        model = f'{git_url}#{short_hash}',
+        format_version = '0.2',
+        segmentation_data = result
+    )
 
-with open('output.json', 'w') as output:
-    json.dump(result, output)
+    with open('output.json', 'w') as output:
+        json.dump(result, output)
 
-mlflow.log_artifact('output.json')
+    mlflow.log_artifact('output.json')
