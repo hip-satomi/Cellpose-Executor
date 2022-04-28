@@ -1,6 +1,6 @@
 # CellPose-Executor
 
-This is a [SegServe](https://github.com/hip-satomi/SegServe) executor for the [Cellpose](https://doi.org/10.1038/s41592-020-01018-x) and [Omnipose](https://doi.org/10.1101/2021.11.03.467199 ) cell segmentation methdod [implementation](https://github.com/MouseLand/cellpose).
+This is a [SegServe](https://github.com/hip-satomi/SegServe) executor for the [Cellpose](https://doi.org/10.1038/s41592-020-01018-x) and [Omnipose](https://doi.org/10.1101/2021.11.03.467199 ) cell segmentation method [implementation](https://github.com/MouseLand/cellpose).
 
 ## Local testing
 
