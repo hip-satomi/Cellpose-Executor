@@ -7,7 +7,7 @@ This is a [SegServe](https://github.com/hip-satomi/SegServe) executor for the [C
 Make sure you have [anaconda](https://www.anaconda.com/products/distribution) installed and an active environment with [`mlflow`](https://pypi.org/project/mlflow/). Then execute
 ```bash
 pip install mlflow
-mlproject run ./ -e omnipose -P input_images=<path to your local image or image folder (*.png)>
+mlflow run ./ -e omnipose -P input_images=<path to your local image or image folder (*.png)>
 ```
 The resulting segmentation should be written to `output.json` and logged as an artifact in the mlflow run.
 
