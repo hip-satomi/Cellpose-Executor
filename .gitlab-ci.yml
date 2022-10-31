@@ -40,6 +40,8 @@ test-online-exec:
   after_script:
     - rm ${SERVICE_LOG_NAME}
   artifacts:
-    reports:
-      cobertura: coverage.xml
+      reports:
+        coverage_report:
+          coverage_format: cobertura
+          path: coverage.xml
 
