@@ -22,11 +22,10 @@ test-online-exec:
   services:
     - name: $CI_REGISTRY/satomi/seg-serve/server:master
       alias: segserve
-      entrypoint:
-      - /bin/bash
       command:
+      - /bin/bash
       - -c
-      - "echo Log dir: ${SERVICE_LOG_NAME}; ls /; ls -all /builds; mkdir -p /builds/service-logs; ls /builds; source /home/appuser/.bashrc; uvicorn --host 0.0.0.0 --port 80 main:app 2>&1 | tee ${SERVICE_LOG_NAME}"
+      - "echo $USER; echo Log dir: ${SERVICE_LOG_NAME}; ls /; ls -all /builds; mkdir -p /builds/service-logs; ls /builds; uvicorn --host 0.0.0.0 --port 80 main:app 2>&1 | tee ${SERVICE_LOG_NAME}"
 
   script:
     - echo "Log dir ${SERVICE_LOG_NAME}"
