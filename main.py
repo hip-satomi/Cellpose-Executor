@@ -19,6 +19,16 @@ import glob
 from cellpose import models
 from git_utils import get_git_revision_short_hash, get_git_url
 
+import logging
+import multiprocessing
+
+# max workers
+max_workers = os.environ.get("MASK_PP_MAX_WORKERS", multiprocessing.cpu_count())
+chunksize = os.environ.get("MASK_PP_CHUNKSIZE", 4)
+
+logging.info(f"{max_workers=}")
+logging.info(f"{chunksize=}")
+
 def extract_rois(int_mask):
     num_cells = np.max(int_mask)
     score_threshold = 0.5
@@ -82,7 +92,7 @@ def predict(images, omni):
     full_result = []
 
     all_rois = []
-    for res in process_map(extract_rois, masks, max_workers=5, chunksize=4):
+    for res in process_map(extract_rois, masks, max_workers=max_workers, chunksize=chunksize):
         all_rois.append(res)
 
     for roi_list in all_rois:
