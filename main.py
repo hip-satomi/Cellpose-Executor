@@ -26,19 +26,23 @@ import multiprocessing
 max_workers = os.environ.get("MASK_PP_MAX_WORKERS", multiprocessing.cpu_count())
 chunksize = os.environ.get("MASK_PP_CHUNKSIZE", 4)
 
+# limit cv2 to one thread (e.g. for contour parsing). For batch prediction we are already using multiprocessing
+cv2.setNumThreads(1)
+
 logging.info(f"{max_workers=}")
 logging.info(f"{chunksize=}")
 
 def extract_rois(int_mask):
     num_cells = np.max(int_mask)
-    score_threshold = 0.5
 
     all_contours = []
 
     for index in range(1, num_cells+1):
-        bool_mask = int_mask == index
+        # get binary mask for the specific instance index
+        binary_mask = int_mask == index
 
-        contours, hierarchy = cv2.findContours(np.where(bool_mask > score_threshold, 1, 0).astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        # find contour on binary mask
+        contours, hierarchy = cv2.findContours(binary_mask.astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         for contour in contours:
             contour = np.squeeze(contour)
